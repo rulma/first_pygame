@@ -6,7 +6,7 @@ from pygame.constants import K_SPACE
 #important var, screen size, title, fps and ship vel
 WIDTH , HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("SUPER BETA!")
+pygame.display.set_caption("SUPER BETA! v0.1")
 
 #create border to seperate player sides
 BORDER = pygame.Rect(WIDTH/2 - 20, 0, 10, HEIGHT)
@@ -25,7 +25,7 @@ MAX_BULLLETS = 3
 
 #game bg color
 BG = (250,150,200)
-BGPIC = pygame.image.load(os.path.join("Assets","Full Moon - background"))
+#BGPIC = pygame.image.load(os.path.join("Assets","Moon.png"))
 BLACK = (0,0,0)
 BLUE = (0, 0, 128)
 RED = (200, 0, 0 )
@@ -49,7 +49,7 @@ RED_SPACESHIP = pygame.transform.rotate(pygame.transform.scale(
 
 #updates and draw screen
 def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS):
-    WIN.fill(BGPIC,[0,0])
+    WIN.fill(BG)
     pygame.draw.rect(WIN, BLACK, BORDER)
     WIN.blit(YELLOW_SPACESHIP, (yellow.x, yellow.y))
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
@@ -149,7 +149,7 @@ def main():
                 if event.key == pygame.K_RIGHTBRACKET and len(YELLOW_BULLETS) < MAX_BULLLETS:
                     
                     bullet = pygame.Rect(
-                        yellow.x + yellow.width, yellow.y + yellow.height//2  - 2, 10, 5)
+                        yellow.x +  10, yellow.y + yellow.height//2 + 10, 10, 5)
 
                     YELLOW_BULLETS.append(bullet)
                     print(YELLOW_BULLETS)
@@ -158,7 +158,7 @@ def main():
                 if event.key == pygame.K_SPACE and len(RED_BULLETS) < MAX_BULLLETS:
 
                     bullet = pygame.Rect(
-                        red.x, red.y + red.height//2  - 2, 10, 5)
+                        red.x + red.width, red.y + red.height//2 - 12, 10, 5)
 
                     RED_BULLETS.append(bullet)
                     print(RED_BULLETS)
