@@ -16,9 +16,7 @@ HEALTH_FONT = pygame.font.SysFont("comicsans", 40)
 #locked refresh rate
 FPS = 60
 #arrays to store player lives(deaths) when the array has N indexs the other player wins
-RED_LIVES = []
 
-YELLOW_LIVES = []
 
 #set velocity for ship movement
 VEL = 5
@@ -57,7 +55,9 @@ Y_LIVES_3 = pygame.transform.rotate(
 RED_SPACESHIP_IMAGE = pygame.image.load(os.path.join("Assets","spaceship_red.png"))
 RED_SPACESHIP = pygame.transform.rotate(pygame.transform.scale(
     RED_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT )),90)
-
+R_LIVES_1 = pygame.transform.rotate(pygame.transform.scale(RED_SPACESHIP_IMAGE, (SHIP_WIDTH - 20, SHIP_HEIGHT - 20)), 180)
+R_LIVES_2 = pygame.transform.rotate(pygame.transform.scale(RED_SPACESHIP_IMAGE, (SHIP_WIDTH - 20, SHIP_HEIGHT - 20)), 180)
+R_LIVES_3 = pygame.transform.rotate(pygame.transform.scale(RED_SPACESHIP_IMAGE, (SHIP_WIDTH - 20, SHIP_HEIGHT - 20)), 180)
 SPACE = pygame.transform.scale(pygame.image.load
     (os.path.join("Assets", "space.png")),(WIDTH, HEIGHT))
 
@@ -65,7 +65,7 @@ SPACE = pygame.transform.scale(pygame.image.load
 
 
 #updates and draw screen
-def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS, red_health, yellow_health):
+def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS, red_health, yellow_health, RED_LIVES, YELLOW_LIVES):
     WIN.blit(SPACE, [0,0])
     pygame.draw.rect(WIN, BLACK, BORDER)
 
@@ -79,10 +79,19 @@ def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS, red_health, yellow_heal
 
     WIN.blit(YELLOW_SPACESHIP, (yellow.x, yellow.y))
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
-
-    WIN.blit(Y_LIVES_1,(WIDTH//2,10))
-    WIN.blit(Y_LIVES_2,(WIDTH//2 + 20,0))
-    WIN.blit(Y_LIVES_3,(WIDTH//2 + 40,10))
+    if len(YELLOW_LIVES) == 0:
+        WIN.blit(Y_LIVES_1,(WIDTH//2,10))
+        WIN.blit(Y_LIVES_2,(WIDTH//2 + 20,0))
+        WIN.blit(Y_LIVES_3,(WIDTH//2 + 40,10))
+    elif len(YELLOW_LIVES) == 1:
+        WIN.blit(Y_LIVES_2,(WIDTH//2 + 20,0))
+        WIN.blit(Y_LIVES_3, (WIDTH//2 + 40,10))
+    elif len(YELLOW_LIVES) == 2:
+        WIN.blits(Y_LIVES_3, (WIDTH//2 + 40,10)) 
+   
+    WIN.blit(R_LIVES_1,(WIDTH//2 - 40,10))
+    WIN.blit(R_LIVES_2,(WIDTH//2 - 60,0))
+    WIN.blit(R_LIVES_3,(WIDTH//2- 80,10))
 
     #WIN.draw.text("HI-SCORE", 20,20)
     
@@ -168,6 +177,9 @@ def main():
 
     RED_BULLETS = []
     YELLOW_BULLETS = []
+    
+    RED_LIVES = []
+    YELLOW_LIVES = []
 
     run = True
     clock = pygame.time.Clock()
@@ -208,14 +220,27 @@ def main():
                 yellow_health -= 1
     
             winner_txt = ""
-            if red_health <= 0:
-                RED_LIVES.append()
+            if red_health <= 0 and len(RED_LIVES) < 1:
+                lives = 1
+                RED_LIVES.append(lives)
+                red_health = 10
                 #Want to have a smaller version of the ships drawn in top corner, when they die remove or grey out ship
-                if RED_LIVES == 0:
-                    winner_txt = "BLUE WINS"
+                #if len(RED_LIVES) == 3:
+                    #winner_txt = "BLUE WINS"
+            elif red_health <= 0 and len(RED_LIVES) < 2:
+                lives = 1
+                RED_LIVES.append(lives)
+                red_health = 10
+
+            elif red_health <= 0 and len(RED_LIVES) < 3:
+                lives = 1
+                RED_LIVES.append(lives)
+                red_health = 10
+    
             if yellow_health <= 0:
-                YELLOW_LIVES -= 1
-                if YELLOW_LIVES == 0:    
+                lives = 1
+                YELLOW_LIVES.append(lives)
+                if len(YELLOW_LIVES) == 3:    
                     winner_txt = "RED WINS!"
 
                 
@@ -223,7 +248,7 @@ def main():
         yellow_handle_movement(keys_pressed, yellow)
         red_handle_movement(keys_pressed, red)
         handle_bullets(YELLOW_BULLETS,RED_BULLETS,yellow,red)
-        draw_window(red, yellow,RED_BULLETS, YELLOW_BULLETS, red_health, yellow_health)
+        draw_window(red, yellow,RED_BULLETS, YELLOW_BULLETS, red_health, yellow_health, RED_LIVES, YELLOW_LIVES)
     pygame.quit()
 
 if __name__ == "__main__":
