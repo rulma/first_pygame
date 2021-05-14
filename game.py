@@ -159,6 +159,22 @@ def handle_bullets(YELLOW_BULLETS, RED_BULLETS, yellow, red):
             RED_BULLETS.remove(bullet)
 
 
+#####################TO DO##################
+
+# number of "#" indicate difficulty/ priority of task # = most pressing, #### = reach/far off idea
+
+           # need to add draw animation for explosion of ship and some kind of reset timer in between deaths.
+           # would be cool to figure out aniumations wit sprites as well inststead of just overlaying PNGS over rect generated in oygame
+           
+           ## Work on title page?
+           ## User button interface (RESET, HOME, START)
+
+           ### basic AI to play against cpu......(Adjustable dificulty w hi score tracker)
+           ### Item/ability spawns, maybe change shot angle or bullet size/speed
+           ### track score based off accuracy and shots takem, maybe a grading scale?
+
+           #### ship editor? maybe give template for ship look and have user be able to color and save their ships SUPER REACH GOAL    
+
 
 
 
