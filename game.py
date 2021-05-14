@@ -1,7 +1,6 @@
 import pygame
 import os
-
-from pygame.constants import K_SPACE
+pygame.font.init()
 
 #important var, screen size, title, fps and ship vel
 WIDTH , HEIGHT = 1000, 800
@@ -9,31 +8,38 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SUPER BETA! v0.1")
 
 #create border to seperate player sides
-BORDER = pygame.Rect(WIDTH/2 - 20, 0, 10, HEIGHT)
+BORDER = pygame.Rect(WIDTH//2 - 2, 0, 5, HEIGHT)
+
+HEALTH_FONT = pygame.font.SysFont("comicsans", 40)
+
 
 #locked refresh rate
 FPS = 60
+#arrays to store player lives(deaths) when the array has N indexs the other player wins
+RED_LIVES = []
 
+YELLOW_LIVES = []
 
 #set velocity for ship movement
 VEL = 5
-
-
-
+#set bullet vel
 BULLET_VEL = 7
+#set max bhullets on screenm respective to plaery
 MAX_BULLLETS = 3
 
-#game bg color
+
+
+#game bg color, and other color variables
 BG = (250,150,200)
-#BGPIC = pygame.image.load(os.path.join("Assets","Moon.png"))
-BLACK = (0,0,0)
-BLUE = (0, 0, 128)
-RED = (200, 0, 0 )
+BLACK = (0,0,0)  
+WHITE = (255, 255, 255)
+RED = (255, 0, 100 )
+
 #Set default ship size
 SHIP_HEIGHT = 60
 SHIP_WIDTH = 40
 
-
+#create unique events for when yellow or red is hit by a bullet
 YELLOW_HIT =pygame.USEREVENT + 1
 RED_HIT = pygame.USEREVENT + 2
 
@@ -41,27 +47,54 @@ RED_HIT = pygame.USEREVENT + 2
 YELLOW_SPACESHIP_IMAGE = pygame.image.load(os.path.join("Assets","spaceship_blue.png"))
 YELLOW_SPACESHIP = pygame.transform.rotate(
     pygame.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH + 50, SHIP_HEIGHT + 50)), 90)
-
+Y_LIVES_1 = pygame.transform.rotate(
+    pygame.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH - 10, SHIP_HEIGHT - 10)), 0)
+Y_LIVES_2 = pygame.transform.rotate(
+    pygame.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH - 10, SHIP_HEIGHT - 10)), 0)
+Y_LIVES_3 = pygame.transform.rotate(
+    pygame.transform.scale(YELLOW_SPACESHIP_IMAGE, (SHIP_WIDTH - 10, SHIP_HEIGHT - 10)), 0)
 #get file path for red spaceship asset
 RED_SPACESHIP_IMAGE = pygame.image.load(os.path.join("Assets","spaceship_red.png"))
 RED_SPACESHIP = pygame.transform.rotate(pygame.transform.scale(
     RED_SPACESHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT )),90)
 
+SPACE = pygame.transform.scale(pygame.image.load
+    (os.path.join("Assets", "space.png")),(WIDTH, HEIGHT))
+
+
+
+
 #updates and draw screen
-def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS):
-    WIN.fill(BG)
+def draw_window (red, yellow,RED_BULLETS,YELLOW_BULLETS, red_health, yellow_health):
+    WIN.blit(SPACE, [0,0])
     pygame.draw.rect(WIN, BLACK, BORDER)
+
+    red_health_text = HEALTH_FONT.render("Health = " + str(red_health), 1 , WHITE)
+    yellow_health_text = HEALTH_FONT.render("Health = " + str(yellow_health), 1 , WHITE)
+
+    WIN.blit(red_health_text,( 10, 10))
+    WIN.blit(yellow_health_text, (WIDTH - yellow_health_text.get_width() - 10, 10))
+
+
+
     WIN.blit(YELLOW_SPACESHIP, (yellow.x, yellow.y))
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
+
+    WIN.blit(Y_LIVES_1,(WIDTH//2,10))
+    WIN.blit(Y_LIVES_2,(WIDTH//2 + 20,0))
+    WIN.blit(Y_LIVES_3,(WIDTH//2 + 40,10))
+
     #WIN.draw.text("HI-SCORE", 20,20)
     
-
+    #draw a bullet on screen with its respect vel, position measurements
     for bullet in RED_BULLETS:
         pygame.draw.rect(WIN,RED,bullet)
+
     for bullet in YELLOW_BULLETS:
-        pygame.draw.rect(WIN,BLUE,bullet)
+        pygame.draw.rect(WIN,WHITE,bullet)
 
     pygame.display.update()
+
 
     
 #Handle User 1 input for ship
@@ -89,7 +122,10 @@ def yellow_handle_movement(keys_pressed, yellow):
          yellow.y += VEL
 
 
+
+#counts bullets on screen and detect if the bullet has hit other platyer or travel off screen, assign velocity variable to bullet 
 def handle_bullets(YELLOW_BULLETS, RED_BULLETS, yellow, red):
+    
     for bullet in YELLOW_BULLETS:
         
         bullet.x -= BULLET_VEL
@@ -98,9 +134,10 @@ def handle_bullets(YELLOW_BULLETS, RED_BULLETS, yellow, red):
             YELLOW_BULLETS.remove(bullet)
             pygame.event.post(pygame.event.Event(RED_HIT))
 
-        
         elif bullet.x < 0:
             YELLOW_BULLETS.remove(bullet)
+
+            
     for bullet in RED_BULLETS:
 
         bullet.x += BULLET_VEL
@@ -118,14 +155,17 @@ def handle_bullets(YELLOW_BULLETS, RED_BULLETS, yellow, red):
 
 
 
-
         
 #Main Program
 def main():
 
     red = pygame.Rect(100,300,SHIP_WIDTH, SHIP_HEIGHT)
     yellow = pygame.Rect(700,300,SHIP_WIDTH, SHIP_HEIGHT)
-    
+
+    red_health = 10 
+    yellow_health = 10
+
+
     RED_BULLETS = []
     YELLOW_BULLETS = []
 
@@ -152,7 +192,7 @@ def main():
                         yellow.x +  10, yellow.y + yellow.height//2 + 10, 10, 5)
 
                     YELLOW_BULLETS.append(bullet)
-                    print(YELLOW_BULLETS)
+                    
 
                 #check if user 2 has fired
                 if event.key == pygame.K_SPACE and len(RED_BULLETS) < MAX_BULLLETS:
@@ -161,13 +201,29 @@ def main():
                         red.x + red.width, red.y + red.height//2 - 12, 10, 5)
 
                     RED_BULLETS.append(bullet)
-                    print(RED_BULLETS)
+            if event.type == RED_HIT:
+                red_health = red_health - 1
+    
+            if event.type == YELLOW_HIT:
+                yellow_health -= 1
+    
+            winner_txt = ""
+            if red_health <= 0:
+                RED_LIVES.append()
+                #Want to have a smaller version of the ships drawn in top corner, when they die remove or grey out ship
+                if RED_LIVES == 0:
+                    winner_txt = "BLUE WINS"
+            if yellow_health <= 0:
+                YELLOW_LIVES -= 1
+                if YELLOW_LIVES == 0:    
+                    winner_txt = "RED WINS!"
+
                 
         keys_pressed = pygame.key.get_pressed()
         yellow_handle_movement(keys_pressed, yellow)
         red_handle_movement(keys_pressed, red)
         handle_bullets(YELLOW_BULLETS,RED_BULLETS,yellow,red)
-        draw_window(red, yellow,RED_BULLETS, YELLOW_BULLETS)
+        draw_window(red, yellow,RED_BULLETS, YELLOW_BULLETS, red_health, yellow_health)
     pygame.quit()
 
 if __name__ == "__main__":
