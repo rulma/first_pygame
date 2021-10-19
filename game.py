@@ -229,13 +229,13 @@ def main():
                         red.x + red.width, red.y + red.height//2 - 12, 10, 5)
 
                     RED_BULLETS.append(bullet)
+            
             if event.type == RED_HIT:
                 red_health = red_health - 1
     
             if event.type == YELLOW_HIT:
                 yellow_health -= 1
     
-            winner_txt = ""
             if red_health <= 0 and len(RED_LIVES) < 1:
                 lives = 1
                 RED_LIVES.append(lives)
@@ -253,11 +253,11 @@ def main():
                 RED_LIVES.append(lives)
                 red_health = 10
     
-            if yellow_health <= 0:
-                lives = 1
-                YELLOW_LIVES.append(lives)
-                if len(YELLOW_LIVES) == 3:    
-                    winner_txt = "RED WINS!"
+            # if yellow_health <= 0:
+            #     lives = 1
+            #     YELLOW_LIVES.append(lives)
+            #     if len(YELLOW_LIVES) == 3:    
+            #         winner_txt = "RED WINS!"
 
                 
         keys_pressed = pygame.key.get_pressed()
